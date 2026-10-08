@@ -1,31 +1,25 @@
-<div align="center">
-  <a href="https://github.com/webpack/webpack">
-    <img width="200" height="200" src="https://webpack.js.org/assets/icon-square-big.svg">
-  </a>
-</div>
+# @unabandoned/worker-loader
 
-[![npm][npm]][npm-url]
-[![node][node]][node-url]
-[![deps][deps]][deps-url]
-[![tests][tests]][tests-url]
-[![coverage][cover]][cover-url]
-[![chat][chat]][chat-url]
-[![size][size]][size-url]
+A maintained fork of [`worker-loader`](https://github.com/webpack-contrib/worker-loader),
+which webpack-contrib archived in 2021. It is kept alive in the
+[`unabandoned`](https://github.com/unabandoned) org because projects of ours still
+load their Web Workers through it.
 
-# worker-loader
+This fork targets **webpack 5 only** and has **no runtime dependencies**: options are
+validated by webpack itself (`this.getOptions(schema)`) and requests are stringified
+with webpack's own `this.utils.contextify`. Webpack 4 support has been removed.
 
-**DEPRECATED for v5**: https://webpack.js.org/guides/web-workers/
-
-Web Worker loader for webpack 4.
-
-Note that this is specific to webpack 4. To use Web Workers in webpack 5, see https://webpack.js.org/guides/web-workers/.
+For new code, webpack 5 can bundle workers natively with
+`new Worker(new URL("./worker.js", import.meta.url))` — see
+https://webpack.js.org/guides/web-workers/.
 
 ## Getting Started
 
-To begin, you'll need to install `worker-loader`:
+To begin, install it under the `worker-loader` name, so `loader: "worker-loader"` and
+`worker-loader!` requests keep resolving:
 
 ```console
-$ npm install worker-loader --save-dev
+$ npm install worker-loader@npm:@unabandoned/worker-loader --save-dev
 ```
 
 ### Inlined
@@ -622,27 +616,6 @@ module.exports = {
 };
 ```
 
-## Contributing
-
-Please take a moment to read our contributing guidelines if you haven't yet done so.
-
-[CONTRIBUTING](./.github/CONTRIBUTING.md)
-
 ## License
 
 [MIT](./LICENSE)
-
-[npm]: https://img.shields.io/npm/v/worker-loader.svg
-[npm-url]: https://npmjs.com/package/worker-loader
-[node]: https://img.shields.io/node/v/worker-loader.svg
-[node-url]: https://nodejs.org
-[deps]: https://david-dm.org/webpack-contrib/worker-loader.svg
-[deps-url]: https://david-dm.org/webpack-contrib/worker-loader
-[tests]: https://github.com/webpack-contrib/worker-loader/workflows/worker-loader/badge.svg
-[tests-url]: https://github.com/webpack-contrib/worker-loader/actions
-[cover]: https://codecov.io/gh/webpack-contrib/worker-loader/branch/master/graph/badge.svg
-[cover-url]: https://codecov.io/gh/webpack-contrib/worker-loader
-[chat]: https://badges.gitter.im/webpack/webpack.svg
-[chat-url]: https://gitter.im/webpack/webpack
-[size]: https://packagephobia.now.sh/badge?p=worker-loader
-[size-url]: https://packagephobia.now.sh/result?p=worker-loader

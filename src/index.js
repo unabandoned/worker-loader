@@ -1,52 +1,33 @@
-import path from "path";
+"use strict";
 
-import { getOptions } from "loader-utils";
-import { validate } from "schema-utils";
+const path = require("node:path");
 
-import NodeTargetPlugin from "webpack/lib/node/NodeTargetPlugin";
-import SingleEntryPlugin from "webpack/lib/SingleEntryPlugin";
-import WebWorkerTemplatePlugin from "webpack/lib/webworker/WebWorkerTemplatePlugin";
-import ExternalsPlugin from "webpack/lib/ExternalsPlugin";
-
-import schema from "./options.json";
-import supportWebpack5 from "./supportWebpack5";
-import supportWebpack4 from "./supportWebpack4";
-import {
+const schema = require("./options.json");
+const runAsChild = require("./runAsChild");
+const {
   getDefaultFilename,
   getDefaultChunkFilename,
   getExternalsType,
-} from "./utils";
+} = require("./utils");
 
-let FetchCompileWasmPlugin;
-let FetchCompileAsyncWasmPlugin;
+function loader() {}
 
-// determine the version of webpack peer dependency
-// eslint-disable-next-line global-require, import/no-unresolved
-const useWebpack5 = require("webpack/package.json").version.startsWith("5.");
-
-if (useWebpack5) {
-  // eslint-disable-next-line global-require, import/no-unresolved
-  FetchCompileWasmPlugin = require("webpack/lib/web/FetchCompileWasmPlugin");
-  // eslint-disable-next-line global-require, import/no-unresolved
-  FetchCompileAsyncWasmPlugin = require("webpack/lib/web/FetchCompileAsyncWasmPlugin");
-} else {
-  // eslint-disable-next-line global-require, import/no-unresolved, import/extensions
-  FetchCompileWasmPlugin = require("webpack/lib/web/FetchCompileWasmTemplatePlugin");
-}
-
-export default function loader() {}
-
-export function pitch(request) {
+function pitch(request) {
   this.cacheable(false);
 
-  const options = getOptions(this);
+  // webpack 5 validates the options against the schema itself.
+  const options = this.getOptions(schema);
 
-  validate(schema, options, {
-    name: "Worker Loader",
-    baseDataPath: "options",
-  });
+  // Use the plugins of the webpack instance that is running this loader, so
+  // the child compiler can never be built from a second copy of webpack.
+  const {
+    EntryPlugin,
+    ExternalsPlugin,
+    node: { NodeTargetPlugin },
+    web: { FetchCompileWasmPlugin, FetchCompileAsyncWasmPlugin },
+    webworker: { WebWorkerTemplatePlugin },
+  } = this._compiler.webpack;
 
-  const workerContext = {};
   const compilerOptions = this._compiler.options || {};
   const filename = options.filename
     ? options.filename
@@ -58,16 +39,19 @@ export function pitch(request) {
     ? options.publicPath
     : compilerOptions.output.publicPath;
 
-  workerContext.options = {
-    filename,
-    chunkFilename,
-    publicPath,
-    globalObject: "self",
+  const workerContext = {
+    request,
+    options: {
+      filename,
+      chunkFilename,
+      publicPath,
+      globalObject: "self",
+    },
   };
 
   workerContext.compiler = this._compilation.createChildCompiler(
     `worker-loader ${request}`,
-    workerContext.options
+    workerContext.options,
   );
 
   new WebWorkerTemplatePlugin().apply(workerContext.compiler);
@@ -76,39 +60,27 @@ export function pitch(request) {
     new NodeTargetPlugin().apply(workerContext.compiler);
   }
 
-  if (FetchCompileWasmPlugin) {
-    new FetchCompileWasmPlugin({
-      mangleImports: compilerOptions.optimization.mangleWasmImports,
-    }).apply(workerContext.compiler);
-  }
+  new FetchCompileWasmPlugin({
+    mangleImports: compilerOptions.optimization.mangleWasmImports,
+  }).apply(workerContext.compiler);
 
-  if (FetchCompileAsyncWasmPlugin) {
-    new FetchCompileAsyncWasmPlugin().apply(workerContext.compiler);
-  }
+  new FetchCompileAsyncWasmPlugin().apply(workerContext.compiler);
 
   if (compilerOptions.externals) {
     new ExternalsPlugin(
       getExternalsType(compilerOptions),
-      compilerOptions.externals
+      compilerOptions.externals,
     ).apply(workerContext.compiler);
   }
 
-  new SingleEntryPlugin(
+  new EntryPlugin(
     this.context,
     `!!${request}`,
-    path.parse(this.resourcePath).name
+    path.parse(this.resourcePath).name,
   ).apply(workerContext.compiler);
 
-  workerContext.request = request;
-
-  const cb = this.async();
-
-  if (
-    workerContext.compiler.cache &&
-    typeof workerContext.compiler.cache.get === "function"
-  ) {
-    supportWebpack5(this, workerContext, options, cb);
-  } else {
-    supportWebpack4(this, workerContext, options, cb);
-  }
+  runAsChild(this, workerContext, options, this.async());
 }
+
+module.exports = loader;
+module.exports.pitch = pitch;
