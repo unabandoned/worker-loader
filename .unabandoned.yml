@@ -1,0 +1,30 @@
+schema: 1
+
+package: "@unabandoned/worker-loader"
+
+upstream:
+  repo: webpack-contrib/worker-loader
+  reason: "repository archived by webpack-contrib in 2021; no release since 3.0.8 (2021), still pinned to loader-utils 2 and schema-utils 3"
+
+summary: >-
+  webpack loader that compiles a module as a Web Worker in a child compilation
+  and exports a constructor for it, optionally inlined into the parent bundle as
+  a Blob.
+
+why-forked: >-
+  CyberChef bundles every one of its Web Workers through it, and upstream was
+  archived while carrying two outdated runtime dependencies. webpack 5 now does
+  both of their jobs itself (this.getOptions(schema) and this.utils.contextify),
+  so the fork drops webpack 4 support and has zero runtime dependencies.
+
+used-by:
+  - consumer: TheTechNetwork/CyberChef
+    purpose: >-
+      builds and inlines CyberChef's Web Workers (ChefWorker, DishWorker,
+      InputWorker, LoaderWorker, ZipWorker) via the
+      worker-loader?inline=no-fallback! imports in src/web/waiters, so the web
+      app runs its recipes off the main thread from a single bundle
+
+status: active
+
+tags: [webpack, loader, web-worker, build-tooling]

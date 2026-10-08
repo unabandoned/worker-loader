@@ -1,5 +1,3 @@
-/* eslint-env browser */
-/* eslint-disable no-undef, no-use-before-define, new-cap */
 
 module.exports = (content, workerConstructor, workerOptions, url) => {
   const globalScope = self || window;

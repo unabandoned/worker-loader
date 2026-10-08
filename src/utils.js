@@ -1,4 +1,13 @@
-import { stringifyRequest } from "loader-utils";
+"use strict";
+
+// Equivalent of loader-utils' stringifyRequest, built on the contextify helper
+// webpack 5 hands every loader: a request string that is safe to embed in
+// generated code and stays relative to the module's directory.
+function stringifyRequest(loaderContext, request) {
+  return JSON.stringify(
+    loaderContext.utils.contextify(loaderContext.context, request),
+  );
+}
 
 function getDefaultFilename(filename) {
   if (typeof filename === "function") {
@@ -13,12 +22,6 @@ function getDefaultChunkFilename(chunkFilename) {
 }
 
 function getExternalsType(compilerOptions) {
-  // For webpack@4
-  if (compilerOptions.output.libraryTarget) {
-    return compilerOptions.output.libraryTarget;
-  }
-
-  // For webpack@5
   if (compilerOptions.externalsType) {
     return compilerOptions.externalsType;
   }
@@ -91,7 +94,6 @@ ${
 const innerRegex =
   /\s*[#@]\s*sourceMappingURL\s*=\s*(.*?(?=[\s'"]|\\n|\*\/|$)(?:\\n)?)\s*/;
 
-/* eslint-disable prefer-template */
 const sourceMappingURLRegex = RegExp(
   "(?:" +
     "/\\*" +
@@ -112,9 +114,8 @@ const sourceMappingURLRegex = RegExp(
 const sourceURLWebpackRegex = RegExp(
   "\\/\\/#\\ssourceURL=webpack-internal:\\/\\/\\/(.*?)\\\\n"
 );
-/* eslint-enable prefer-template */
 
-export {
+module.exports = {
   getDefaultFilename,
   getDefaultChunkFilename,
   getExternalsType,

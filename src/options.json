@@ -24,7 +24,7 @@
         }
       ],
       "description": "Set the worker type.",
-      "link": "https://github.com/webpack-contrib/worker-loader#worker"
+      "link": "https://github.com/unabandoned/worker-loader#worker"
     },
     "publicPath": {
       "anyOf": [
@@ -36,7 +36,7 @@
         }
       ],
       "description": "Specifies the public URL address of the output files when referenced in a browser.",
-      "link": "https://github.com/webpack-contrib/worker-loader#publicpath"
+      "link": "https://github.com/unabandoned/worker-loader#publicpath"
     },
     "filename": {
       "anyOf": [
@@ -49,23 +49,23 @@
         }
       ],
       "description": "The filename of entry chunks for web workers.",
-      "link": "https://github.com/webpack-contrib/worker-loader#filename"
+      "link": "https://github.com/unabandoned/worker-loader#filename"
     },
     "chunkFilename": {
       "type": "string",
       "description": "The filename of non-entry chunks for web workers.",
-      "link": "https://github.com/webpack-contrib/worker-loader#chunkfilename",
+      "link": "https://github.com/unabandoned/worker-loader#chunkfilename",
       "minLength": 1
     },
     "inline": {
       "enum": ["no-fallback", "fallback"],
       "description": "Allow to inline the worker as a BLOB.",
-      "link": "https://github.com/webpack-contrib/worker-loader#inline"
+      "link": "https://github.com/unabandoned/worker-loader#inline"
     },
     "esModule": {
       "type": "boolean",
       "description": "Enable or disable ES module syntax.",
-      "link": "https://github.com/webpack-contrib/worker-loader#esmodule"
+      "link": "https://github.com/unabandoned/worker-loader#esmodule"
     }
   },
   "additionalProperties": false
