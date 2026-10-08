@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0](https://github.com/unabandoned/worker-loader/compare/worker-loader-v3.0.8...worker-loader-v4.0.0) (2026-10-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* webpack 4 is no longer supported (peer webpack ^5.27.0), and Node.js >= 22.12 is required.
+
+### Features
+
+* onboard as @unabandoned/worker-loader for webpack 5 ([#1](https://github.com/unabandoned/worker-loader/issues/1)) ([6c7e325](https://github.com/unabandoned/worker-loader/commit/6c7e325b411004ba711eaaf546366222e745fa1e))
+
 ### [3.0.8](https://github.com/webpack-contrib/worker-loader/compare/v3.0.7...v3.0.8) (2021-02-11)
 
 
